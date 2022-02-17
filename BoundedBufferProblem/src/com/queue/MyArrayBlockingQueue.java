@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MyArrayBlockingQueue implements Serializable {
-	private static final long serialVersionUID = 1L;
+// 	private static final long serialVersionUID = 1L;
 	private final Integer[] queue ;
     private final int capacity ;
     //left and right never points to the same position ever.
