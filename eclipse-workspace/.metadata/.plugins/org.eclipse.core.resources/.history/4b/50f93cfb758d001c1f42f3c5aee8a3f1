@@ -1,0 +1,62 @@
+package com.new2.copy;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.Collection;
+import java.util.Queue;
+
+public class FileStore {
+	private Path path = Paths.get("C:\\Users\\gnana-pt4726\\Desktop\\New\\temp.txt");
+	private static String paths = "C:\\Users\\gnana-pt4726\\Desktop\\New\\temp.txt";
+	private OutputStream writer;
+	private BufferedReader reader;
+
+	public FileStore() {
+		try {
+			this.writer = Files.newOutputStream(path, StandardOpenOption.TRUNCATE_EXISTING);
+			this.reader = Files.newBufferedReader(path);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void writeLine(Integer e) throws IOException {
+
+		writer.write(String.format("%s%n", e).getBytes());
+		System.out.println("writing to a file," + e);
+	}
+
+	public String readLine() throws IOException {
+		String line = reader.readLine();
+//		if(line != null)
+//		{
+//		    System.out.println("Read from File");
+//		   
+//		}
+		return line;
+	}
+
+	public void writeQueue(MyArrayBlockingQueue producerCopy) throws IOException {
+		try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(paths))) {
+            oos.writeObject(producerCopy);
+        }
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Queue<Integer> readQueue( Queue<Integer> consumer) throws IOException, ClassNotFoundException {
+	    try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(paths))) {
+	        consumer.addAll((Queue<Integer>) (ois.readObject()));
+	        return consumer;
+	    }
+	}
+}

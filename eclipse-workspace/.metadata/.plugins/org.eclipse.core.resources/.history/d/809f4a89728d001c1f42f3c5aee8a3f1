@@ -1,0 +1,61 @@
+package com.new2.copy;
+
+import java.io.*;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
+
+public class WrapperQueue {
+    private final MyArrayBlockingQueue producerQueue ;
+    private final Queue<Integer> consumerQueue ;
+    private final FileStore fileQueue ;
+    private final int Capacity;
+
+    public WrapperQueue(int capacity) {
+    	//splits the queue into two
+        producerQueue = new MyArrayBlockingQueue(capacity) ;
+        consumerQueue = new ArrayBlockingQueue<Integer>(capacity) ;
+        fileQueue = new FileStore() ;
+        this.Capacity=capacity;
+
+//        // Tries to keep the producerQueue empty at all times
+//        Thread moveToFileDaemon = new Thread(() -> {
+//            while(true) moveToFile();
+//        }) ;
+//        moveToFileDaemon.setDaemon(true);
+//        moveToFileDaemon.start();
+//
+//        // Tries to keep the consumerQueue full at all times
+//        Thread moveFromFileDaemon = new Thread(() -> {
+//            while(true) moveFromFile();
+//        }) ;
+//        moveFromFileDaemon.setDaemon(true);
+//        moveFromFileDaemon.start() ;
+    }
+    //2.take values from the producer queue and place it in the file and always make the producer queue empty using service thread
+    private void moveToFile(MyArrayBlockingQueue producerCopy) {
+//      Integer taken = producerQueue.take() ;
+    	
+        fileQueue.writeQueue(producerCopy);
+    }
+    //3.take values from file and put it in consumer queue and always make it full using service Threads
+    private void moveFromFile() {
+        String taken = fileQueue.poll();
+        consumerQueue.put(Integer.valueOf(taken));
+    }
+    //1.Producer put values in the producer queue
+    public void put(Integer e) {
+    	if(producerQueue.queueFull())
+    	{   
+    		MyArrayBlockingQueue producerCopy=this.producerQueue;
+    		
+    		this.producerQueue=new MyArrayBlockingQueue(Capacity);
+    		new Thread(()-> moveToFile(producerCopy)).start();
+    	}
+    	   
+        producerQueue.put(e);
+    }
+    //4.At last,Consumer consumes it from Consumer queue
+    public Integer take() {
+        return consumerQueue.take();
+    }
+}
