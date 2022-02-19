@@ -7,6 +7,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.CompletableFuture;
 
 public class MyArrayBlockingQueue implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -22,8 +23,6 @@ public class MyArrayBlockingQueue implements Serializable {
 
     private final ReentrantLock takeLock = new ReentrantLock() ;
     private final Condition notEmpty = takeLock.newCondition() ;
-    
-    private transient final ExecutorService pool = Executors.newCachedThreadPool();
     
     public MyArrayBlockingQueue(int capacity) {
         this.capacity = capacity ;
@@ -69,7 +68,7 @@ public class MyArrayBlockingQueue implements Serializable {
                 notFull.await() ;
             }
             addToLast(e) ;
-            pool.execute(this::signalNotEmpty);
+            CompletableFuture.runAsync(this::signalNotEmpty);
         } catch (Exception ex) {
             throw new RuntimeException(ex) ;
         } finally {
@@ -84,7 +83,7 @@ public class MyArrayBlockingQueue implements Serializable {
                 notEmpty.await();
             }
             Integer polled = removeFromFront() ;
-            pool.execute(this::signalNotFull);
+			CompletableFuture.runAsync(this::signalNotFull);
             return polled ;
         } catch (Exception ex) {
             throw new RuntimeException(ex) ;
