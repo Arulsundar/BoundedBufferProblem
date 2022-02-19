@@ -23,7 +23,7 @@ public class MyArrayBlockingQueue implements Serializable {
     private final ReentrantLock takeLock = new ReentrantLock() ;
     private final Condition notEmpty = takeLock.newCondition() ;
     
-    private final ExecutorService pool = Executors.newCachedThreadPool();
+    private transient final ExecutorService pool = Executors.newCachedThreadPool();
     
     public MyArrayBlockingQueue(int capacity) {
         this.capacity = capacity ;
