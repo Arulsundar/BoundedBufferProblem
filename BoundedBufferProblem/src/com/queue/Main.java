@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Main {
 
 	public static void main(String[] args) throws InterruptedException {
-		WrapperQueue q = new WrapperQueue(5);
+		Timer q = new Timer(5);
 		AtomicInteger num=new AtomicInteger();
         ExecutorService pool = Executors.newFixedThreadPool(10);
 		final Runnable producer = () -> {
